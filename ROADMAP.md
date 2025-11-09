@@ -23,12 +23,12 @@ Create a Chrome browser extension that adds an option to the context menu (right
   ```
 
 ### 1.2 Configure manifest.json
-- [ ] Create `manifest.json` file with Manifest V3 configuration
-- [ ] Define basic metadata (name, version, description)
-- [ ] Add permissions (`contextMenus`, `clipboardWrite`, `activeTab`)
-- [ ] Configure background service worker
-- [ ] Configure content scripts
-- [ ] Add extension icons (can use placeholders temporarily)
+- [✓] Create `manifest.json` file with Manifest V3 configuration
+- [✓] Define basic metadata (name, version, description)
+- [✓] Add permissions (`contextMenus`, `clipboardWrite`, `activeTab`)
+- [✓] Configure background service worker
+- [✓] Configure content scripts
+- [✓] Add extension icons (can use placeholders temporarily)
 
 ### 1.3 Prepare Extension Icons
 - [ ] Generate or download icons in sizes: 16x16, 48x48, 128x128
