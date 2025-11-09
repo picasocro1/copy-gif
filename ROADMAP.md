@@ -31,8 +31,8 @@ Create a Chrome browser extension that adds an option to the context menu (right
 - [✓] Add extension icons (can use placeholders temporarily)
 
 ### 1.3 Prepare Extension Icons
-- [ ] Generate or download icons in sizes: 16x16, 48x48, 128x128
-- [ ] Place icons in `icons/` folder
+- [✓] Generate or download icons in sizes: 16x16, 48x48, 128x128
+- [✓] Place icons in `icons/` folder
 
 ---
 
