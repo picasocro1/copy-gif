@@ -44,3 +44,8 @@ generated
 app/**/*.js
 prisma/**/*.js
 prisma.config.js
+
+# Chrome Extension
+*.crx
+*.pem
+web-store-package.zip

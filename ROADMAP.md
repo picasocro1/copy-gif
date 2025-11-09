@@ -1,15 +1,15 @@
-# Roadmap: Chrome Extension - Copy Animated GIF
+# Roadmap: Chrome Extension - Copy GIF
 
 ## Project Goal
-Create a Chrome browser extension that adds an option to the context menu (right-click) allowing users to copy animated GIFs to the clipboard (instead of just a single frame, as with the standard "Copy Image" feature).
+Create a Chrome browser extension that adds an option to the context menu (right-click) allowing users to Copy GIFs to the clipboard (instead of just a single frame, as with the standard "Copy Image" feature).
 
 ---
 
 ## Phase 1: Project Setup
 
 ### 1.1 Initialize Project Structure
-- [ ] Create project folder
-- [ ] Create basic folder structure:
+- [✓] Create project folder
+- [✓] Create basic folder structure:
   ```
   gif-to-clipboard/
   ├── manifest.json
@@ -48,7 +48,7 @@ Create a Chrome browser extension that adds an option to the context menu (right
 - [ ] Implement message passing to content script
 
 **Features:**
-- Create "Copy Animated GIF" option in context menu
+- Create "Copy GIF" option in context menu
 - Send message to content script with information about clicked element
 
 ### 2.2 Content Script - Finding GIFs
@@ -93,7 +93,7 @@ Create a Chrome browser extension that adds an option to the context menu (right
 - [ ] Test 1: Check if context menu displays
 - [ ] Test 2: Find a page with animated GIF (e.g. giphy.com)
 - [ ] Test 3: Right-click on element containing GIF
-- [ ] Test 4: Select "Copy Animated GIF" option
+- [ ] Test 4: Select "Copy GIF" option
 - [ ] Test 5: Paste GIF in another application (e.g. Gmail, Slack)
 - [ ] Test 6: Verify GIF is animated after pasting
 
