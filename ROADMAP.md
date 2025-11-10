@@ -117,10 +117,20 @@ Create a Chrome browser extension that adds an option to the context menu (right
 - [✓] Scripts should install manifest in browser's native messaging directory
 - [✓] Add instructions to README.md and SETUP.md
 
-#### Known Issues & Solutions:
-- [✓] **Python path issue**: Chrome sandbox can't find Python via `/usr/bin/env`
-  - Solution: Use absolute Python path in shebang line
-  - Documented in SETUP.md and README.md
+#### Rust Rewrite (v2.0):
+- [✓] **Migrated from Python to Rust** - COMPLETE!
+  - Zero dependencies (no Python required)
+  - Single self-contained binary (~1.4MB)
+  - Much faster execution
+  - Easier distribution for end users
+  - Cross-platform support maintained
+  - Auto-build in install script
+
+#### Previous Known Issues (Resolved with Rust):
+- [✓] **Python path issue**: Resolved by removing Python dependency entirely
+  - No more shebang issues
+  - No more Python version conflicts
+  - Binary just works™
 
 **Features:**
 - Download GIF to temporary location
