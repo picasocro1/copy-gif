@@ -85,35 +85,42 @@ Create a Chrome browser extension that adds an option to the context menu (right
 **File: `native-host/` directory**
 
 #### Native Host Scripts:
-- [ ] Create `native-host/` directory in project
-- [ ] Create `copy-gif-host.py` - Python script for native messaging
-- [ ] Implement message handling (receive GIF URL from extension)
-- [ ] Implement file download logic in native host
-- [ ] Implement macOS clipboard copy (using `osascript`)
-- [ ] Implement Windows clipboard copy (using PowerShell)
-- [ ] Implement Linux clipboard copy (using `xclip`)
-- [ ] Add error handling and logging
+- [✓] Create `native-host/` directory in project
+- [✓] Create `copy-gif-host.py` - Python script for native messaging
+- [✓] Implement message handling (receive GIF URL from extension)
+- [✓] Implement file download logic in native host
+- [✓] Implement macOS clipboard copy (using `osascript`)
+- [✓] Implement Windows clipboard copy (using PowerShell) - untested
+- [✓] Implement Linux clipboard copy (using `xclip`) - untested
+- [✓] Add error handling and logging
+- [✓] Add WebP to GIF automatic conversion
 
 #### Native Host Manifest:
-- [ ] Create `com.copygif.host.json` manifest file
-- [ ] Configure native host name and path
-- [ ] Specify allowed extension IDs
-- [ ] Set host type as "stdio"
+- [✓] Create `com.copygif.host.json` manifest file
+- [✓] Configure native host name and path
+- [✓] Specify allowed extension IDs
+- [✓] Set host type as "stdio"
 
 #### Extension Updates:
-- [ ] Add `nativeMessaging` permission to `manifest.json`
-- [ ] Update `content.js` to detect if native host is available
-- [ ] Implement fallback: try native host first, then Clipboard API
-- [ ] Add function to send message to native host
-- [ ] Handle native host responses and errors
-- [ ] Update notifications based on copy method used
+- [✓] Add `nativeMessaging` permission to `manifest.json`
+- [✓] Update `content.js` to detect if native host is available
+- [✓] Implement fallback: try native host first, then Clipboard API
+- [✓] Add function to send message to native host (`background.js`)
+- [✓] Handle native host responses and errors
+- [✓] Update notifications based on copy method used
+- [✓] Support direct URL from context menu (image/link contexts)
 
 #### Installation Scripts:
-- [ ] Create `install-native-host.sh` for macOS/Linux
-- [ ] Create `install-native-host.bat` for Windows
-- [ ] Scripts should copy native host to correct location
-- [ ] Scripts should install manifest in browser's native messaging directory
-- [ ] Add instructions to README.md
+- [✓] Create `install-native-host.sh` for macOS/Linux
+- [✓] Create `install-native-host.bat` for Windows - untested
+- [✓] Scripts should copy native host to correct location
+- [✓] Scripts should install manifest in browser's native messaging directory
+- [✓] Add instructions to README.md and SETUP.md
+
+#### Known Issues & Solutions:
+- [✓] **Python path issue**: Chrome sandbox can't find Python via `/usr/bin/env`
+  - Solution: Use absolute Python path in shebang line
+  - Documented in SETUP.md and README.md
 
 **Features:**
 - Download GIF to temporary location
@@ -133,18 +140,18 @@ Create a Chrome browser extension that adds an option to the context menu (right
 ## Phase 3: Local Testing
 
 ### 3.1 Load Extension in Developer Mode
-- [ ] Open Chrome and navigate to `chrome://extensions/`
-- [ ] Enable "Developer mode" (toggle in top right corner)
-- [ ] Click "Load unpacked" and select project folder
-- [ ] Verify extension appears in the list
+- [✓] Open Chrome and navigate to `chrome://extensions/`
+- [✓] Enable "Developer mode" (toggle in top right corner)
+- [✓] Click "Load unpacked" and select project folder
+- [✓] Verify extension appears in the list
 
 ### 3.2 Test Basic Functionality
-- [ ] Test 1: Check if context menu displays
-- [ ] Test 2: Find a page with animated GIF (e.g. giphy.com)
-- [ ] Test 3: Right-click on element containing GIF
-- [ ] Test 4: Select "Copy GIF" option
-- [ ] Test 5: Paste GIF in another application (e.g. Gmail, Slack)
-- [ ] Test 6: Verify GIF is animated after pasting
+- [✓] Test 1: Check if context menu displays
+- [✓] Test 2: Find a page with animated GIF (e.g. giphy.com)
+- [✓] Test 3: Right-click on element containing GIF
+- [✓] Test 4: Select "Copy GIF" option
+- [✓] Test 5: Paste GIF in another application (e.g. Gmail, Slack)
+- [✓] Test 6: Verify GIF is animated after pasting (macOS tested)
 
 ### 3.3 Test Edge Cases
 - [ ] Test on element that does NOT contain a GIF

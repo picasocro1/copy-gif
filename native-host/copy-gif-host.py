@@ -15,22 +15,12 @@ import urllib.request
 import logging
 from pathlib import Path
 
-# Emergency logging to catch early failures
-try:
-    emergency_log = Path.home() / '.copy-gif-extension' / 'emergency.log'
-    emergency_log.parent.mkdir(exist_ok=True)
-    with open(emergency_log, 'a') as f:
-        f.write(f"\n=== Script started at {platform.system()} ===\n")
-        f.flush()
-except Exception as e:
-    pass  # Can't do anything if even this fails
-
 # Setup logging
 log_dir = Path.home() / '.copy-gif-extension'
 log_dir.mkdir(exist_ok=True)
 logging.basicConfig(
     filename=log_dir / 'copy-gif-host.log',
-    level=logging.DEBUG,
+    level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
@@ -264,13 +254,9 @@ def main():
         logging.info("Native messaging host started")
         logging.info(f"Platform: {platform.system()}")
         logging.info(f"Python version: {sys.version}")
-        logging.info(f"stdin isatty: {sys.stdin.isatty()}")
-        logging.info(f"stdin buffer: {sys.stdin.buffer}")
 
         # Read and handle message
-        logging.info("About to read message...")
         message = read_message()
-        logging.info("Message read successfully")
         handle_message(message)
 
     except Exception as e:

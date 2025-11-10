@@ -17,11 +17,13 @@ This extension provides two ways to copy GIFs:
 
 - Right-click context menu option "Copy GIF"
 - **Preserves GIF animation** when native host is installed
-- Works on any website with GIF images
+- Works on any website with GIF images (Giphy, Tenor, Twitter, etc.)
+- **Automatically converts WebP to GIF** when available
 - Finds GIFs in:
   - `<img>` tags
   - `<picture>` elements
   - CSS background images
+  - Direct image URLs from context menu
 - Cross-platform support (macOS, Windows, Linux)
 - Graceful fallback if native host not available
 
@@ -111,16 +113,22 @@ Then follow the prompts and configure your extension ID as described in the nati
 - The extension searches the clicked element and its descendants
 - Check browser console (F12) for more details
 
-### Only first frame is copied
-- Native host is not installed or configured
-- See [`native-host/README.md`](native-host/README.md) for installation
+### Only first frame is copied (PNG fallback mode)
+- Native host is not installed or not connecting
+- **Most common issue**: Python path in shebang line
+  - Run `which python3` to find your Python path
+  - Edit first line of `native-host/copy-gif-host.py` with absolute path
+  - Example: `#!/opt/homebrew/opt/python@3.12/libexec/bin/python3`
+- Check extension ID matches in manifest file
+- **Completely quit and restart Chrome** (Cmd+Q on macOS)
 - Check native host logs: `~/.copy-gif-extension/copy-gif-host.log`
 
-### "Native host not available"
-- Native host not installed or extension ID not configured
+### "Native host not available" or "Native host has exited"
+- Native host can't find Python interpreter
+- Update the shebang line in `copy-gif-host.py` with absolute Python path
 - Verify Python 3 is installed: `python3 --version`
 - Check manifest file has correct extension ID
-- Restart browser after configuration changes
+- See [SETUP.md](SETUP.md) for detailed troubleshooting
 
 ## Development
 

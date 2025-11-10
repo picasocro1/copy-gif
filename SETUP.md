@@ -15,7 +15,7 @@
 Open Terminal and run:
 
 ```bash
-cd /Users/maciejkubiak/Documents/Projects/copy-gif/native-host
+cd native-host
 ./install-native-host.sh
 ```
 
@@ -31,9 +31,15 @@ When prompted:
    ~/Library/Application Support/Google/Chrome/NativeMessagingHosts/com.copygif.host.json
    ```
 
-3. Replace `PLACEHOLDER_EXTENSION_ID` with your actual Extension ID from Step 1
+3. **Replace `PLACEHOLDER_EXTENSION_ID`** with your actual Extension ID from Step 1
 
-4. **Restart Chrome**
+4. **Update Python path in the script:**
+   - Find your Python 3 path: `which python3`
+   - Edit `native-host/copy-gif-host.py`
+   - Update the first line (shebang) from `#!/usr/bin/env python3` to your Python path
+   - Example: `#!/opt/homebrew/opt/python@3.12/libexec/bin/python3`
+
+5. **Completely quit and restart Chrome** (Cmd+Q, not just close windows)
 
 ## Step 3: Test It!
 
@@ -46,15 +52,28 @@ When prompted:
 ## Troubleshooting
 
 ### If you see "first frame only" message:
-- Native host not installed correctly
+- **Native host not connecting** - most common issue is incorrect Python path in shebang
+  - Run `which python3` to find your Python path
+  - Edit the first line of `native-host/copy-gif-host.py` with the absolute path
+  - Example: `#!/opt/homebrew/opt/python@3.12/libexec/bin/python3`
 - Check that Python 3 is available: `python3 --version`
 - Check the extension ID in the manifest file matches your extension ID
-- Restart Chrome after making changes
+- **Completely quit and restart Chrome** (Cmd+Q) after making changes
 
-### If nothing happens:
-- Check Chrome console (F12) for errors
-- Check native host logs: `~/.copy-gif-extension/copy-gif-host.log`
-- Make sure the Python script is executable: `chmod +x native-host/copy-gif-host.py`
+### If you see "No GIF found" or "Not a GIF file":
+- Make sure you're right-clicking directly on the image/GIF
+- Try refreshing the page (F5) to reload the content script
+- The extension works best on sites like Giphy, Tenor, Twitter, etc.
+
+### If the context menu doesn't appear:
+- Refresh the page after installing/reloading the extension
+- Check that the extension is enabled in `chrome://extensions/`
+- The context menu appears when right-clicking on images and links
+
+### Check the logs:
+- Native host logs: `~/.copy-gif-extension/copy-gif-host.log`
+- Chrome extension console: `chrome://extensions/` → Click "Inspect views: service worker"
+- Page console: Right-click page → Inspect → Console tab
 
 ## Success Indicators
 
