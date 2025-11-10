@@ -6,7 +6,8 @@
   "permissions": [
     "contextMenus",
     "clipboardWrite",
-    "activeTab"
+    "activeTab",
+    "nativeMessaging"
   ],
   "host_permissions": [
     "<all_urls>"

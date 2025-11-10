@@ -41,11 +41,11 @@ Create a Chrome browser extension that adds an option to the context menu (right
 ### 2.1 Background Script - Context Menu
 **File: `background.js`**
 
-- [ ] Add listener for `chrome.runtime.onInstalled`
-- [ ] Create context menu using `chrome.contextMenus.create()`
-- [ ] Configure menu to display on all elements (`contexts: ['all']`)
-- [ ] Add handler for menu click (`chrome.contextMenus.onClicked`)
-- [ ] Implement message passing to content script
+- [✓] Add listener for `chrome.runtime.onInstalled`
+- [✓] Create context menu using `chrome.contextMenus.create()`
+- [✓] Configure menu to display on all elements (`contexts: ['all']`)
+- [✓] Add handler for menu click (`chrome.contextMenus.onClicked`)
+- [✓] Implement message passing to content script
 
 **Features:**
 - Create "Copy GIF" option in context menu
@@ -54,11 +54,11 @@ Create a Chrome browser extension that adds an option to the context menu (right
 ### 2.2 Content Script - Finding GIFs
 **File: `content.js`**
 
-- [ ] Add listener for messages from background script (`chrome.runtime.onMessage`)
-- [ ] Implement function to find clicked element on page
-- [ ] Implement recursive DOM search function to find GIFs
-- [ ] Validate if found element is a GIF (check for `.gif` in `src`)
-- [ ] Handle different cases (img tag, background-image in CSS, picture element)
+- [✓] Add listener for messages from background script (`chrome.runtime.onMessage`)
+- [✓] Implement function to find clicked element on page
+- [✓] Implement recursive DOM search function to find GIFs
+- [✓] Validate if found element is a GIF (check for `.gif` in `src`)
+- [✓] Handle different cases (img tag, background-image in CSS, picture element)
 
 **Features:**
 - Function `findGifInElement(element)` - searches element and its descendants
@@ -68,16 +68,65 @@ Create a Chrome browser extension that adds an option to the context menu (right
 ### 2.3 Content Script - Copy GIF to Clipboard
 **File: `content.js`**
 
-- [ ] Implement function to fetch GIF as Blob (`fetch()`)
-- [ ] Implement function to copy to clipboard (`navigator.clipboard.write()`)
-- [ ] Create `ClipboardItem` with appropriate MIME type
-- [ ] Handle errors (CORS, permission denied, timeout)
-- [ ] Add user notifications (success/error)
+- [✓] Implement function to fetch GIF as Blob (`fetch()`)
+- [✓] Implement function to copy to clipboard (`navigator.clipboard.write()`)
+- [✓] Create `ClipboardItem` with appropriate MIME type
+- [✓] Handle errors (CORS, permission denied, timeout)
+- [✓] Add user notifications (success/error)
 
 **Features:**
 - Function `fetchGifAsBlob(url)` - fetches GIF from URL
 - Function `copyBlobToClipboard(blob)` - copies Blob to clipboard
 - Handle different formats (image/gif, web image/gif)
+
+### 2.4 Native Messaging Host - Animated GIF Support
+**Why needed:** Browser Clipboard API doesn't support animated GIFs on any platform (macOS, Windows, Linux). Native messaging allows us to use OS-level clipboard commands to preserve animation.
+
+**File: `native-host/` directory**
+
+#### Native Host Scripts:
+- [ ] Create `native-host/` directory in project
+- [ ] Create `copy-gif-host.py` - Python script for native messaging
+- [ ] Implement message handling (receive GIF URL from extension)
+- [ ] Implement file download logic in native host
+- [ ] Implement macOS clipboard copy (using `osascript`)
+- [ ] Implement Windows clipboard copy (using PowerShell)
+- [ ] Implement Linux clipboard copy (using `xclip`)
+- [ ] Add error handling and logging
+
+#### Native Host Manifest:
+- [ ] Create `com.copygif.host.json` manifest file
+- [ ] Configure native host name and path
+- [ ] Specify allowed extension IDs
+- [ ] Set host type as "stdio"
+
+#### Extension Updates:
+- [ ] Add `nativeMessaging` permission to `manifest.json`
+- [ ] Update `content.js` to detect if native host is available
+- [ ] Implement fallback: try native host first, then Clipboard API
+- [ ] Add function to send message to native host
+- [ ] Handle native host responses and errors
+- [ ] Update notifications based on copy method used
+
+#### Installation Scripts:
+- [ ] Create `install-native-host.sh` for macOS/Linux
+- [ ] Create `install-native-host.bat` for Windows
+- [ ] Scripts should copy native host to correct location
+- [ ] Scripts should install manifest in browser's native messaging directory
+- [ ] Add instructions to README.md
+
+**Features:**
+- Download GIF to temporary location
+- Use OS-specific commands to copy file to clipboard (preserves animation)
+- Auto-cleanup temporary files
+- Cross-platform support (macOS, Windows, Linux)
+- Graceful fallback to PNG if native host not installed
+
+**Locations for Native Messaging Manifests:**
+- **macOS Chrome:** `~/Library/Application Support/Google/Chrome/NativeMessagingHosts/`
+- **macOS Chromium:** `~/Library/Application Support/Chromium/NativeMessagingHosts/`
+- **Windows Chrome:** `HKEY_CURRENT_USER\Software\Google\Chrome\NativeMessagingHosts\`
+- **Linux Chrome:** `~/.config/google-chrome/NativeMessagingHosts/`
 
 ---
 

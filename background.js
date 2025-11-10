@@ -1,1 +1,93 @@
 // Background service worker for Copy GIF extension
+
+const NATIVE_HOST_NAME = 'com.copygif.host';
+
+// Create context menu when extension is installed or updated
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.create({
+    id: 'copy-gif',
+    title: 'Copy GIF',
+    contexts: ['all']
+  });
+
+  console.log('Copy GIF context menu created');
+});
+
+// Handle context menu clicks
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId === 'copy-gif') {
+    // Send message to content script with click information
+    chrome.tabs.sendMessage(tab.id, {
+      action: 'copyGif',
+      frameId: info.frameId,
+      // Pass coordinates to help locate the clicked element
+      x: info.pageX || 0,
+      y: info.pageY || 0
+    }).catch(error => {
+      console.error('Error sending message to content script:', error);
+    });
+  }
+});
+
+// Handle messages from content script
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'useNativeHost') {
+    // Use native messaging to copy GIF
+    useNativeHost(message.url)
+      .then(result => sendResponse(result))
+      .catch(error => sendResponse({ success: false, error: error.message }));
+
+    return true; // Keep message channel open for async response
+  }
+});
+
+/**
+ * Use native messaging host to copy GIF
+ */
+async function useNativeHost(url) {
+  return new Promise((resolve, reject) => {
+    try {
+      // Connect to native messaging host
+      const port = chrome.runtime.connectNative(NATIVE_HOST_NAME);
+
+      // Handle response from native host
+      port.onMessage.addListener((response) => {
+        console.log('Native host response:', response);
+
+        if (response.success) {
+          resolve({ success: true, method: 'native' });
+        } else {
+          resolve({ success: false, error: response.error || 'Unknown error' });
+        }
+
+        port.disconnect();
+      });
+
+      // Handle errors
+      port.onDisconnect.addListener(() => {
+        const error = chrome.runtime.lastError;
+
+        if (error) {
+          console.error('Native host disconnected with error:', error);
+          resolve({
+            success: false,
+            error: `Native host not available: ${error.message}`
+          });
+        }
+      });
+
+      // Send message to native host
+      port.postMessage({
+        action: 'copyGif',
+        url: url
+      });
+
+    } catch (error) {
+      console.error('Error connecting to native host:', error);
+      resolve({
+        success: false,
+        error: `Failed to connect to native host: ${error.message}`
+      });
+    }
+  });
+}
