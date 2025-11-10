@@ -103,8 +103,8 @@ Then follow the prompts and configure your extension ID as described in the nati
 - No special requirements
 
 ### Native Host (for animated GIFs)
-- Python 3 (usually pre-installed)
-- **Linux only**: `xclip` or `wl-copy`
+- No dependencies! (Rust binary is self-contained)
+- **Linux only**: `xclip` or `wl-copy` (for clipboard access)
 
 ## Troubleshooting
 
@@ -115,24 +115,49 @@ Then follow the prompts and configure your extension ID as described in the nati
 
 ### Only first frame is copied (PNG fallback mode)
 - Native host is not installed or not connecting
-- **Most common issue**: Python path in shebang line
-  - Run `which python3` to find your Python path
-  - Edit first line of `native-host/copy-gif-host.py` with absolute path
-  - Example: `#!/opt/homebrew/opt/python@3.12/libexec/bin/python3`
+- **Most common issue**: Binary not built or wrong path in manifest
+  - Check if binary exists: `native-host/target/release/copy-gif-host`
+  - If not, build it: `cd native-host && cargo build --release`
+  - Verify manifest path points to the binary
 - Check extension ID matches in manifest file
 - **Completely quit and restart Chrome** (Cmd+Q on macOS)
 - Check native host logs: `~/.copy-gif-extension/copy-gif-host.log`
 
 ### "Native host not available" or "Native host has exited"
-- Native host can't find Python interpreter
-- Update the shebang line in `copy-gif-host.py` with absolute Python path
-- Verify Python 3 is installed: `python3 --version`
-- Check manifest file has correct extension ID
+- Native host binary not found or not executable
+- Build the binary: `cd native-host && cargo build --release`
+- Check manifest file has correct path and extension ID
 - See [SETUP.md](SETUP.md) for detailed troubleshooting
 
 ## Development
 
 See [`ROADMAP.md`](ROADMAP.md) for development progress and planned features.
+
+### Building the Native Host from Source
+
+The native host is written in **Rust** for maximum performance and minimal dependencies.
+
+**Prerequisites:**
+- Install Rust: https://rustup.rs/
+  ```bash
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  ```
+
+**Build:**
+```bash
+cd native-host
+cargo build --release
+```
+
+The compiled binary will be in `native-host/target/release/copy-gif-host`
+
+**Binary sizes (optimized):**
+- macOS (ARM64): ~1.4MB
+- macOS (x86_64): ~1.5MB
+- Windows: ~1.6MB
+- Linux: ~1.8MB
+
+**Note:** The Python version (`copy-gif-host.py`) is deprecated and kept for reference only. All new development should use the Rust version.
 
 ## Contributing
 

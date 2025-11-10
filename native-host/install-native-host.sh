@@ -23,22 +23,45 @@ echo ""
 
 # Get the directory where this script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-HOST_SCRIPT="${SCRIPT_DIR}/copy-gif-host.py"
+HOST_BINARY="${SCRIPT_DIR}/target/release/copy-gif-host"
 HOST_MANIFEST="${SCRIPT_DIR}/com.copygif.host.json"
 
-# Check if files exist
-if [ ! -f "${HOST_SCRIPT}" ]; then
-    echo "Error: copy-gif-host.py not found!"
-    exit 1
-fi
-
+# Check if manifest exists
 if [ ! -f "${HOST_MANIFEST}" ]; then
     echo "Error: com.copygif.host.json not found!"
     exit 1
 fi
 
-# Make sure the Python script is executable
-chmod +x "${HOST_SCRIPT}"
+# Check if binary exists, if not, build it
+if [ ! -f "${HOST_BINARY}" ]; then
+    echo "Binary not found. Building from source..."
+    echo ""
+
+    # Check if cargo is installed
+    if ! command -v cargo &> /dev/null; then
+        echo "Error: Rust/Cargo is not installed!"
+        echo ""
+        echo "Please install Rust from: https://rustup.rs/"
+        echo "Run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
+        exit 1
+    fi
+
+    # Build the binary
+    echo "Building native host binary..."
+    cd "${SCRIPT_DIR}"
+    cargo build --release
+
+    if [ ! -f "${HOST_BINARY}" ]; then
+        echo "Error: Build failed!"
+        exit 1
+    fi
+
+    echo "✓ Build successful!"
+    echo ""
+fi
+
+echo "Using binary: ${HOST_BINARY}"
+echo ""
 
 # Determine native messaging host directory based on OS and browser
 if [ "${OS_TYPE}" = "macOS" ]; then
@@ -63,8 +86,8 @@ install_for_browser() {
     # Create directory if it doesn't exist
     mkdir -p "${install_dir}"
 
-    # Create a modified manifest with the correct path
-    sed "s|PLACEHOLDER_PATH|${SCRIPT_DIR}|g" "${HOST_MANIFEST}" > "${install_dir}/com.copygif.host.json"
+    # Create a modified manifest with the correct path (pointing to the Rust binary)
+    sed "s|PLACEHOLDER_PATH|${HOST_BINARY}|g" "${HOST_MANIFEST}" > "${install_dir}/com.copygif.host.json"
 
     echo "  ✓ Installed to: ${install_dir}"
 }

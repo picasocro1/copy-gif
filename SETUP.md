@@ -33,13 +33,7 @@ When prompted:
 
 3. **Replace `PLACEHOLDER_EXTENSION_ID`** with your actual Extension ID from Step 1
 
-4. **Update Python path in the script:**
-   - Find your Python 3 path: `which python3`
-   - Edit `native-host/copy-gif-host.py`
-   - Update the first line (shebang) from `#!/usr/bin/env python3` to your Python path
-   - Example: `#!/opt/homebrew/opt/python@3.12/libexec/bin/python3`
-
-5. **Completely quit and restart Chrome** (Cmd+Q, not just close windows)
+4. **Completely quit and restart Chrome** (Cmd+Q, not just close windows)
 
 ## Step 3: Test It!
 
@@ -52,13 +46,13 @@ When prompted:
 ## Troubleshooting
 
 ### If you see "first frame only" message:
-- **Native host not connecting** - most common issue is incorrect Python path in shebang
-  - Run `which python3` to find your Python path
-  - Edit the first line of `native-host/copy-gif-host.py` with the absolute path
-  - Example: `#!/opt/homebrew/opt/python@3.12/libexec/bin/python3`
-- Check that Python 3 is available: `python3 --version`
+- **Native host not connecting** - check the following:
+  - Verify the binary exists at `native-host/target/release/copy-gif-host`
+  - If not, run `cargo build --release` in the native-host directory
+  - Check the manifest file path points to the correct binary location
 - Check the extension ID in the manifest file matches your extension ID
 - **Completely quit and restart Chrome** (Cmd+Q) after making changes
+- Check logs: `~/.copy-gif-extension/copy-gif-host.log`
 
 ### If you see "No GIF found" or "Not a GIF file":
 - Make sure you're right-clicking directly on the image/GIF

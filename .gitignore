@@ -49,3 +49,8 @@ prisma.config.js
 *.crx
 *.pem
 web-store-package.zip
+
+# Rust
+/native-host/target/
+/native-host/Cargo.lock
+*.rs.bk

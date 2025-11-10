@@ -1,0 +1,25 @@
+[package]
+name = "copy-gif-host"
+version = "1.0.0"
+edition = "2024"
+authors = ["Copy GIF Contributors"]
+description = "Native messaging host for Copy GIF Chrome extension"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+reqwest = { version = "0.12", features = ["blocking"] }
+tempfile = "3.8"
+log = "0.4"
+env_logger = "0.11"
+dirs = "5.0"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+cocoa = "0.25"
+objc = "0.2"
+
+[profile.release]
+opt-level = "z"     # Optimize for size
+lto = true          # Enable Link Time Optimization
+codegen-units = 1   # Maximize size reduction
+strip = true        # Strip symbols from binary
