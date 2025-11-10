@@ -54,3 +54,9 @@ web-store-package.zip
 /native-host/target/
 /native-host/Cargo.lock
 *.rs.bk
+
+# Installers
+/installers/macos/dist/
+/installers/macos/payload/
+/installers/windows/dist/
+/installers/linux/dist/

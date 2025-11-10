@@ -1,0 +1,114 @@
+#!/bin/bash
+
+# Post-installation script for Copy GIF Native Host
+# This script installs the native messaging manifest for Chrome and Chromium-based browsers
+
+set -e
+
+BINARY_PATH="/usr/local/bin/copy-gif-host"
+MANIFEST_NAME="com.copygif.host.json"
+
+# Manifest template
+create_manifest() {
+    local manifest_path="$1"
+    cat > "$manifest_path" <<'EOF'
+{
+  "name": "com.copygif.host",
+  "description": "Native messaging host for Copy GIF extension",
+  "path": "/usr/local/bin/copy-gif-host",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://PLACEHOLDER_EXTENSION_ID/"
+  ]
+}
+EOF
+}
+
+# Install for a specific browser
+install_for_browser() {
+    local browser_name="$1"
+    local manifest_dir="$2"
+
+    # Create directory if it doesn't exist
+    if [ ! -d "$manifest_dir" ]; then
+        mkdir -p "$manifest_dir"
+    fi
+
+    # Create manifest
+    create_manifest "$manifest_dir/$MANIFEST_NAME"
+
+    echo "  ✓ Installed manifest for $browser_name"
+}
+
+echo "========================================"
+echo "Copy GIF - Native Host Installation"
+echo "========================================"
+echo ""
+echo "Installing native messaging manifests..."
+echo ""
+
+# Install for Chrome
+CHROME_DIR="$HOME/Library/Application Support/Google/Chrome/NativeMessagingHosts"
+if [ -d "$HOME/Library/Application Support/Google/Chrome" ]; then
+    install_for_browser "Chrome" "$CHROME_DIR"
+fi
+
+# Install for Chromium
+CHROMIUM_DIR="$HOME/Library/Application Support/Chromium/NativeMessagingHosts"
+if [ -d "$HOME/Library/Application Support/Chromium" ]; then
+    install_for_browser "Chromium" "$CHROMIUM_DIR"
+fi
+
+# Install for Brave
+BRAVE_DIR="$HOME/Library/Application Support/BraveSoftware/Brave-Browser/NativeMessagingHosts"
+if [ -d "$HOME/Library/Application Support/BraveSoftware/Brave-Browser" ]; then
+    install_for_browser "Brave" "$BRAVE_DIR"
+fi
+
+# Install for Edge
+EDGE_DIR="$HOME/Library/Application Support/Microsoft Edge/NativeMessagingHosts"
+if [ -d "$HOME/Library/Application Support/Microsoft Edge" ]; then
+    install_for_browser "Edge" "$EDGE_DIR"
+fi
+
+echo ""
+echo "========================================"
+echo "Installation Complete!"
+echo "========================================"
+echo ""
+echo "========================================"
+echo "⚠️  One More Step: Configure Extension ID"
+echo "========================================"
+echo ""
+
+# Try to launch the configuration helper automatically
+HELPER_SCRIPT="/usr/local/bin/copy-gif-configure"
+
+if [ -f "$HELPER_SCRIPT" ]; then
+    echo "Launching configuration helper..."
+    echo ""
+
+    # Run the configuration script in a new Terminal window
+    # This ensures it has proper GUI context
+    open -a Terminal.app "$HELPER_SCRIPT" 2>/dev/null || {
+        echo "Could not auto-launch configuration helper."
+        echo ""
+        echo "Please run manually: $HELPER_SCRIPT"
+        echo ""
+    }
+else
+    # Fallback to manual instructions
+    echo "Configuration helper not found. Manual setup required:"
+    echo ""
+    echo "1. Open Chrome and go to chrome://extensions/"
+    echo "2. Find 'Copy GIF' and copy the Extension ID"
+    echo "3. Run this command (replace YOUR_EXTENSION_ID):"
+    echo ""
+    echo "   sed -i '' 's/PLACEHOLDER_EXTENSION_ID/YOUR_EXTENSION_ID/g' \\"
+    echo "     \"$HOME/Library/Application Support/Google/Chrome/NativeMessagingHosts/com.copygif.host.json\""
+    echo ""
+    echo "4. Restart your browser"
+    echo ""
+fi
+
+exit 0

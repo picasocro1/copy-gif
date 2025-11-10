@@ -43,21 +43,21 @@ This extension provides two ways to copy GIFs:
 
 See detailed instructions in [`native-host/README.md`](native-host/README.md)
 
-**Quick install:**
+**Recommended: Use the installer (macOS)**
 
-**macOS/Linux:**
+Download the latest `.pkg` installer from [Releases](https://github.com/YOUR_USERNAME/copy-gif/releases):
+- Double-click to install
+- Follow post-install instructions to configure your Extension ID
+- Restart Chrome
+
+**Alternative: Manual installation (All platforms)**
+
 ```bash
 cd native-host
 ./install-native-host.sh
 ```
 
-**Windows:**
-```cmd
-cd native-host
-install-native-host.bat
-```
-
-Then follow the prompts and configure your extension ID as described in the native host README.
+Then follow the prompts and configure your extension ID as described in [SETUP.md](SETUP.md).
 
 ## Usage
 
