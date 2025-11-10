@@ -3,13 +3,35 @@
 // Listen for messages from background script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'copyGif') {
-    handleCopyGif(message.x, message.y);
+    // Check if we have a direct URL or need to find it via coordinates
+    if (message.directUrl) {
+      handleCopyGifWithUrl(message.directUrl);
+    } else {
+      handleCopyGif(message.x, message.y);
+    }
   }
   return true; // Keep message channel open for async response
 });
 
 /**
- * Main function to handle copying GIF
+ * Handle copying GIF when we have a direct URL
+ */
+async function handleCopyGifWithUrl(url) {
+  try {
+    console.log('Attempting to copy from URL:', url);
+
+    // For images from context menu, try to copy directly
+    // We'll determine if it's actually a GIF during the fetch
+    await copyGifToClipboard(url);
+
+  } catch (error) {
+    console.error('Error copying GIF:', error);
+    showNotification('Failed to copy GIF: ' + error.message, 'error');
+  }
+}
+
+/**
+ * Main function to handle copying GIF (coordinate-based)
  */
 async function handleCopyGif(x, y) {
   try {
@@ -121,10 +143,39 @@ function isGifUrl(url) {
 }
 
 /**
- * Fetch GIF from URL and copy to clipboard
+ * Fetch image from URL and copy to clipboard
  */
 async function copyGifToClipboard(url) {
   try {
+    console.log('Fetching image from URL:', url);
+
+    // First, fetch to check the actual content type
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const blob = await response.blob();
+    const contentType = blob.type;
+
+    console.log('Image content type:', contentType, 'Size:', blob.size);
+
+    // Check if it's actually a GIF (be lenient - accept if URL suggests it's a GIF or if content type is GIF)
+    const urlLooksLikeGif = url.toLowerCase().includes('gif') || url.toLowerCase().includes('giphy');
+    const isActuallyGif = contentType.includes('gif');
+
+    console.log('URL looks like GIF:', urlLooksLikeGif, 'Content type is GIF:', isActuallyGif);
+
+    if (!isActuallyGif && !urlLooksLikeGif) {
+      showNotification('Not a GIF file (detected: ' + contentType + ')', 'error');
+      return;
+    }
+
+    // If content type isn't GIF but URL suggests it should be, warn but try anyway
+    if (!isActuallyGif && urlLooksLikeGif) {
+      console.warn('URL suggests GIF but content type is:', contentType, '- attempting anyway');
+    }
+
     // Try native messaging host first (preserves animation)
     const nativeResult = await tryNativeMessaging(url);
 
@@ -135,9 +186,6 @@ async function copyGifToClipboard(url) {
 
     // Fallback to Clipboard API if native messaging failed
     console.warn('Native messaging failed, falling back to Clipboard API:', nativeResult.error);
-
-    // Fetch the GIF as a blob
-    const blob = await fetchGifAsBlob(url);
 
     // Copy blob to clipboard (will auto-fallback to PNG if needed)
     const result = await copyBlobToClipboard(blob);
@@ -150,7 +198,7 @@ async function copyGifToClipboard(url) {
     }
 
   } catch (error) {
-    throw new Error('Failed to copy GIF: ' + error.message);
+    throw new Error('Failed to copy: ' + error.message);
   }
 }
 

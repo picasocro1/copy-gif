@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/opt/homebrew/opt/python@3.12/libexec/bin/python3
 """
 Native Messaging Host for Copy GIF Extension
 Handles copying animated GIFs to clipboard using OS-specific methods
@@ -14,6 +14,16 @@ import tempfile
 import urllib.request
 import logging
 from pathlib import Path
+
+# Emergency logging to catch early failures
+try:
+    emergency_log = Path.home() / '.copy-gif-extension' / 'emergency.log'
+    emergency_log.parent.mkdir(exist_ok=True)
+    with open(emergency_log, 'a') as f:
+        f.write(f"\n=== Script started at {platform.system()} ===\n")
+        f.flush()
+except Exception as e:
+    pass  # Can't do anything if even this fails
 
 # Setup logging
 log_dir = Path.home() / '.copy-gif-extension'
@@ -34,29 +44,57 @@ def send_message(message):
 
 def read_message():
     """Read message from extension"""
-    raw_length = sys.stdin.buffer.read(4)
-    if not raw_length:
-        logging.info("No message to read, exiting")
-        sys.exit(0)
+    try:
+        raw_length = sys.stdin.buffer.read(4)
+        if not raw_length:
+            logging.info("No message to read, exiting")
+            sys.exit(0)
 
-    message_length = struct.unpack('I', raw_length)[0]
-    message = sys.stdin.buffer.read(message_length).decode('utf-8')
-    logging.debug(f"Received message: {message}")
-    return json.loads(message)
+        message_length = struct.unpack('I', raw_length)[0]
+        logging.debug(f"Message length: {message_length}")
+
+        message = sys.stdin.buffer.read(message_length).decode('utf-8')
+        logging.debug(f"Received message: {message}")
+        return json.loads(message)
+    except Exception as e:
+        logging.error(f"Error reading message: {e}")
+        raise
 
 def download_gif(url):
     """Download GIF from URL to temporary file"""
     try:
+        # Try to convert WebP URLs to GIF URLs (common on Giphy, Tenor, etc.)
+        original_url = url
+        if url.endswith('.webp'):
+            url = url[:-5] + '.gif'
+            logging.info(f"Converted WebP URL to GIF: {url}")
+
         # Create temp file with .gif extension
         temp_fd, temp_path = tempfile.mkstemp(suffix='.gif', prefix='copygif_')
         os.close(temp_fd)
 
         logging.info(f"Downloading GIF from: {url}")
 
-        # Download the file
-        urllib.request.urlretrieve(url, temp_path)
+        # Try to download the GIF version
+        try:
+            urllib.request.urlretrieve(url, temp_path)
+        except Exception as e:
+            # If GIF version fails and we converted from WebP, try original URL
+            if url != original_url:
+                logging.warning(f"GIF URL failed, trying original WebP URL: {original_url}")
+                urllib.request.urlretrieve(original_url, temp_path)
+            else:
+                raise
 
         logging.info(f"Downloaded to: {temp_path}")
+
+        # Verify the file is actually a GIF
+        with open(temp_path, 'rb') as f:
+            header = f.read(6)
+            if not (header.startswith(b'GIF87a') or header.startswith(b'GIF89a')):
+                logging.warning(f"Downloaded file is not a GIF (header: {header[:6]})")
+                raise Exception("Downloaded file is not a valid GIF format")
+
         return temp_path
 
     except Exception as e:
@@ -222,18 +260,25 @@ def handle_message(message):
 
 def main():
     """Main function"""
-    logging.info("Native messaging host started")
-    logging.info(f"Platform: {platform.system()}")
-    logging.info(f"Python version: {sys.version}")
-
     try:
+        logging.info("Native messaging host started")
+        logging.info(f"Platform: {platform.system()}")
+        logging.info(f"Python version: {sys.version}")
+        logging.info(f"stdin isatty: {sys.stdin.isatty()}")
+        logging.info(f"stdin buffer: {sys.stdin.buffer}")
+
         # Read and handle message
+        logging.info("About to read message...")
         message = read_message()
+        logging.info("Message read successfully")
         handle_message(message)
 
     except Exception as e:
-        logging.error(f"Fatal error: {e}")
-        send_message({'success': False, 'error': str(e)})
+        logging.error(f"Fatal error: {e}", exc_info=True)
+        try:
+            send_message({'success': False, 'error': str(e)})
+        except:
+            pass
 
     finally:
         logging.info("Native messaging host exiting")

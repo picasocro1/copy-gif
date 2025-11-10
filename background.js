@@ -7,7 +7,7 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: 'copy-gif',
     title: 'Copy GIF',
-    contexts: ['all']
+    contexts: ['image', 'link']  // Show on images and links
   });
 
   console.log('Copy GIF context menu created');
@@ -16,16 +16,29 @@ chrome.runtime.onInstalled.addListener(() => {
 // Handle context menu clicks
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === 'copy-gif') {
-    // Send message to content script with click information
-    chrome.tabs.sendMessage(tab.id, {
-      action: 'copyGif',
-      frameId: info.frameId,
-      // Pass coordinates to help locate the clicked element
-      x: info.pageX || 0,
-      y: info.pageY || 0
-    }).catch(error => {
-      console.error('Error sending message to content script:', error);
-    });
+    // Check if we have a direct URL from the context menu
+    const url = info.srcUrl || info.linkUrl;
+
+    if (url) {
+      // We have a direct URL, send it to content script
+      chrome.tabs.sendMessage(tab.id, {
+        action: 'copyGif',
+        directUrl: url,
+        frameId: info.frameId
+      }).catch(error => {
+        console.error('Error sending message to content script:', error);
+      });
+    } else {
+      // Fallback to coordinate-based detection
+      chrome.tabs.sendMessage(tab.id, {
+        action: 'copyGif',
+        frameId: info.frameId,
+        x: info.pageX || 0,
+        y: info.pageY || 0
+      }).catch(error => {
+        console.error('Error sending message to content script:', error);
+      });
+    }
   }
 });
 
