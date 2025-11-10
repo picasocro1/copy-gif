@@ -10,8 +10,9 @@ With the native host installed, you can copy fully animated GIFs!
 
 ## Requirements
 
-- **Python 3** (already installed on most systems)
-- **macOS**: No additional requirements
+The native host is written in **Rust** for maximum performance and zero runtime dependencies.
+
+- **macOS**: No additional requirements (uses native Cocoa APIs)
 - **Windows**: No additional requirements (uses PowerShell)
 - **Linux**: Install `xclip` or `wl-copy`:
   ```bash
@@ -23,6 +24,14 @@ With the native host installed, you can copy fully animated GIFs!
 
   # Arch
   sudo pacman -S xclip
+  ```
+
+### Building from Source
+
+If you're building from source (the installer does this automatically), you'll need:
+- **Rust toolchain** (install from https://rustup.rs/)
+  ```bash
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
   ```
 
 ## Installation
@@ -105,8 +114,8 @@ After running the installation script, you need to configure the extension ID:
 ### "Native host not available" error
 
 - Make sure you ran the installation script
-- Check that Python 3 is installed: `python3 --version`
 - Verify the extension ID is correct in the manifest file
+- Check that the native host binary exists at the path specified in the manifest
 - Restart your browser after making changes
 
 ### Extension works but copies only first frame
@@ -117,17 +126,21 @@ After running the installation script, you need to configure the extension ID:
 
 ### Permission denied errors (macOS/Linux)
 
-- Make sure the scripts are executable:
+- Make sure the installation script is executable:
   ```bash
-  chmod +x copy-gif-host.py
   chmod +x install-native-host.sh
   ```
 
-### Python not found (Windows)
+### Build errors
 
-- Install Python 3 from https://www.python.org/downloads/
-- Make sure "Add Python to PATH" is checked during installation
-- Restart Command Prompt after installation
+- If the build fails, ensure you have the latest stable Rust toolchain:
+  ```bash
+  rustup update stable
+  ```
+- On macOS, you may need Xcode Command Line Tools:
+  ```bash
+  xcode-select --install
+  ```
 
 ## Uninstallation
 
@@ -157,13 +170,14 @@ reg delete "HKCU\Software\Microsoft\Edge\NativeMessagingHosts\com.copygif.host" 
 
 ## How it works
 
-1. Extension detects a GIF and sends the URL to the native host
-2. Native host downloads the GIF to a temporary file
+1. Extension detects a GIF and sends the URL to the native host via native messaging
+2. Native host (written in Rust) downloads the GIF to a temporary file
 3. Native host uses OS-specific clipboard commands:
-   - **macOS**: AppleScript with GIF format support
+   - **macOS**: Native Cocoa APIs with GIF format support
    - **Windows**: PowerShell with file clipboard support
    - **Linux**: xclip or wl-copy with image/gif MIME type
 4. Temporary file is cleaned up automatically
+5. Response is sent back to the extension confirming success or failure
 
 ## Security
 

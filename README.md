@@ -75,10 +75,10 @@ Then follow the prompts and configure your extension ID as described in [SETUP.m
 ### With Native Host (Animated GIFs)
 
 1. Extension finds the GIF URL in the page
-2. Sends URL to native messaging host
+2. Sends URL to native messaging host (written in Rust)
 3. Native host downloads GIF to temp file
 4. Native host uses OS-specific clipboard commands:
-   - **macOS**: AppleScript with GIF format
+   - **macOS**: Native Cocoa APIs with GIF format support
    - **Windows**: PowerShell file clipboard
    - **Linux**: xclip/wl-copy with image/gif MIME type
 5. Temp file is deleted automatically
@@ -157,7 +157,7 @@ The compiled binary will be in `native-host/target/release/copy-gif-host`
 - Windows: ~1.6MB
 - Linux: ~1.8MB
 
-**Note:** The Python version (`copy-gif-host.py`) is deprecated and kept for reference only. All new development should use the Rust version.
+**Note:** The native host is built automatically by the installer. The Rust source code is in `native-host/src/` for those interested in building from source.
 
 ## Contributing
 

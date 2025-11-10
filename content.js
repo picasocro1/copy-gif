@@ -20,6 +20,13 @@ async function handleCopyGifWithUrl(url) {
   try {
     console.log('Attempting to copy from URL:', url);
 
+    // Quick check if URL looks like a GIF
+    if (!isGifUrl(url)) {
+      // URL doesn't look like a GIF, but it might still be one (e.g., served with unusual URL)
+      // Let's check the actual content type
+      console.warn('URL doesn\'t look like a GIF, will verify content type:', url);
+    }
+
     // For images from context menu, try to copy directly
     // We'll determine if it's actually a GIF during the fetch
     await copyGifToClipboard(url);
@@ -167,7 +174,9 @@ async function copyGifToClipboard(url) {
     console.log('URL looks like GIF:', urlLooksLikeGif, 'Content type is GIF:', isActuallyGif);
 
     if (!isActuallyGif && !urlLooksLikeGif) {
-      showNotification('Not a GIF file (detected: ' + contentType + ')', 'error');
+      // Not a GIF at all
+      const fileType = contentType.split('/')[1] || 'unknown';
+      showNotification(`Not a GIF file - this is a ${fileType.toUpperCase()} image`, 'error');
       return;
     }
 

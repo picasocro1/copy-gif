@@ -164,7 +164,7 @@ Create a Chrome browser extension that adds an option to the context menu (right
 - [✓] Test 6: Verify GIF is animated after pasting (macOS tested)
 
 ### 3.3 Test Edge Cases
-- [ ] Test on element that does NOT contain a GIF
+- [✓] Test on element that does NOT contain a GIF - improved with better error messages
 - [ ] Test on GIF from different domain (CORS)
 - [ ] Test on very large GIF (>10MB)
 - [ ] Test on GIF in `<picture>` element
@@ -185,9 +185,13 @@ Create a Chrome browser extension that adds an option to the context menu (right
 ## Phase 4: Improvements and Polish
 
 ### 4.1 Dynamic Menu Display
-- [ ] Modify code so menu only shows when element contains a GIF
-- [ ] Use `chrome.contextMenus.update()` to dynamically change visibility
-- [ ] Optimize performance (cache, debouncing)
+- [✓] Improved menu behavior - shows only on image/link contexts
+- [✓] Added URL validation before processing
+- [✓] Better error messages when non-GIF images are clicked
+- [~] Full dynamic hiding not possible with Chrome Manifest V3 API limitations
+  - Menu restricted to image/link contexts only
+  - URL pre-validation added in background script
+  - Content type verification with clear error feedback
 
 ### 4.2 User Experience
 - [ ] Add icon to context menu option
